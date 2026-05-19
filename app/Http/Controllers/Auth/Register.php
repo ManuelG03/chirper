@@ -30,10 +30,7 @@ class Register extends Controller
         // Log them in
         Auth::login($user);
 
-        // Dispatch the registered event
-        event(new Registered($user));
-
-        // Redirect to email verification page
-        return redirect()->route('verification.notice');
+        // Redirect to home
+        return redirect('/')->with('success', 'Welcome to Chirper!');
     }
 }
