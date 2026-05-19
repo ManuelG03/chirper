@@ -42,14 +42,16 @@ class ChirpController extends Controller
     ]
     );
 
-    // Create the chirp (no user for now - we'll add auth later)
-    \App\Models\Chirp::create([
-        'message' => $validated['message'],
-        'user_id' => null, // We'll add authentication in lesson 11
-    ]);
+    // If the user is not logged in, redirect to login page
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'You must be logged in to post a chirp.');
+    }
+   
+    // Create the chirp associated with the authenticated user
+    auth()->user()->chirps()->create($validated);
 
-    // Redirect back to the feed
-    return redirect('/')->with('success', 'Chirp created!');
+    return redirect('/')->with('success', 'Your chirp has been posted!');
+
 }
     /**
      * Display the specified resource.
@@ -62,32 +64,37 @@ class ChirpController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Chirp $chirp)
-    {
-        return view('chirps.edit', ['chirp' => $chirp]);
-    }
+   public function edit(Chirp $chirp)
+{
+    $this->authorize('update', $chirp);
+
+    return view('chirps.edit', compact('chirp'));
+}
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Chirp $chirp)
-    {
-        $validated = $request->validate([
-            'message' => 'required|string|max:255|min:5',
-        ]);
+{
+    $this->authorize('update', $chirp);
 
-        $chirp->update($validated);
+    $validated = $request->validate([
+        'message' => 'required|string|max:255',
+    ]);
 
-        return redirect('/')->with('success', 'Chirp updated!');
-    }
+    $chirp->update($validated);
 
+    return redirect('/')->with('success', 'Chirp updated!');
+}
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Chirp $chirp)
-    {
-        $chirp->delete();
+{
+    $this->authorize('delete', $chirp);
 
-        return redirect('/')->with('success', 'Chirp deleted!');
-    }
+    $chirp->delete();
+
+    return redirect('/')->with('success', 'Chirp deleted!');
+}
 }

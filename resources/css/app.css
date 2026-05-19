@@ -21,3 +21,15 @@
         }
     }
 }
+
+html[data-theme="laravelChirper"],
+:root:has(input.theme-controller[value=laravelChirper]:checked) body {
+    color: var(--text-12);
+}
+
+/* Navbar = sand + hairline bottom */
+.navbar {
+    background: var(--color-base-100);
+    border-bottom: var(--border) solid var(--border-color-soft);
+    backdrop-filter: saturate(140%) blur(6px);
+}
